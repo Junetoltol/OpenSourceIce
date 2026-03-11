@@ -1,0 +1,18 @@
+# Claude Code 관련 파일 (팀원과 공유 불필요)
+.claude/
+CLAUDE.md
+
+# 교재 PDF (저작권, 용량 문제로 제외)
+pdf/
+
+# 프론트엔드 패키지 (npm install로 재설치 가능)
+frontend/node_modules/
+frontend/dist/
+
+# 운영체제 자동 생성 파일
+.DS_Store
+Thumbs.db
+
+# 환경변수 파일 (보안)
+.env
+.env.local

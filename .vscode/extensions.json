@@ -1,0 +1,17 @@
+{
+  // 이 파일을 열면 VS Code가 아래 확장 프로그램 설치를 자동으로 추천해줍니다.
+  "recommendations": [
+    // ─── Java 개발 필수 ─────────────────────────────────────────
+    "vscjava.vscode-java-pack",              // Extension Pack for Java (자동완성, 디버깅 등)
+    "redhat.vscode-community-server-connector", // Community Server Connectors (Tomcat 연결)
+
+    // ─── 프론트엔드 (Vue + Tailwind) ────────────────────────────
+    "Vue.volar",                             // Vue Language Features (Vue 3 공식 지원)
+    "bradlc.vscode-tailwindcss",             // Tailwind CSS IntelliSense (자동완성)
+    "esbenp.prettier-vscode",               // Prettier (코드 자동 정렬)
+
+    // ─── 협업 / 편의 ────────────────────────────────────────────
+    "eamodio.gitlens",                       // GitLens (Git 히스토리 쉽게 보기)
+    "streetsidesoftware.code-spell-checker"  // 오타 체크
+  ]
+}
