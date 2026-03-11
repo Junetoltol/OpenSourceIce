@@ -28,6 +28,20 @@ const routes = [
     component: () => import('@/views/SignupView.vue'),
   },
 
+  // 회원 가입 완료
+  {
+    path: '/signup-success',
+    name: 'signup-success',
+    component: () => import('@/views/SignupSuccessView.vue'),
+  },
+
+  // 회원 목록 (관리자 로그인 후)
+  {
+    path: '/members',
+    name: 'members',
+    component: () => import('@/views/MembersView.vue'),
+  },
+
 ]
 
 // ──────────────────────────────────────────

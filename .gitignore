@@ -9,6 +9,9 @@ pdf/
 frontend/node_modules/
 frontend/dist/
 
+# 백엔드 빌드 산출물 (mvn package로 재생성 가능)
+backend/*/target/
+
 # 운영체제 자동 생성 파일
 .DS_Store
 Thumbs.db
