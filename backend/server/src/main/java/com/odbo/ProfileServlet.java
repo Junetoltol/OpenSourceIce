@@ -9,6 +9,11 @@ import java.sql.*;
 @WebServlet("/api/profile")
 public class ProfileServlet extends HttpServlet {
 
+    // 비밀번호 규칙: 8~16자, 영문·숫자·특수문자 각 1개 이상 (SignupServlet과 동일)
+    private static final java.util.regex.Pattern PW_PATTERN = java.util.regex.Pattern.compile(
+        "^(?=.*[a-zA-Z])(?=.*\\d)(?=.*[!@#$%^&*()_+\\-=\\[\\]{};':\"\\\\|,.<>/?]).{8,16}$"
+    );
+
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse res) throws IOException {
         res.setContentType("application/json; charset=UTF-8");
@@ -50,6 +55,13 @@ public class ProfileServlet extends HttpServlet {
             if ((newEmail == null || newEmail.isEmpty()) && (newPassword == null || newPassword.isEmpty())) {
                 res.setStatus(400);
                 res.getWriter().write("{\"success\": false, \"message\": \"변경할 내용을 입력해 주세요.\"}");
+                return;
+            }
+
+            // 새 비밀번호 유효성 검사
+            if (newPassword != null && !newPassword.isEmpty() && !PW_PATTERN.matcher(newPassword).matches()) {
+                res.setStatus(400);
+                res.getWriter().write("{\"success\": false, \"message\": \"비밀번호는 8~16자이며 영문, 숫자, 특수문자를 각 1개 이상 포함해야 합니다.\"}");
                 return;
             }
 
