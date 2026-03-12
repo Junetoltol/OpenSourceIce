@@ -1,12 +1,12 @@
-<!-- 관리자 로그인 화면: /api/login 호출 후 성공하면 회원 목록(/members)으로 이동 -->
+<!-- 사용자 로그인 화면: /api/login 호출 후 성공하면 마이페이지(/user/mypage)로 이동 -->
 <template>
   <div class="min-h-screen bg-gray-100 flex items-center justify-center">
     <div class="bg-white rounded-2xl shadow-lg w-full max-w-sm px-10 py-10">
       <!-- 로고 -->
       <div class="flex flex-col items-center mb-8">
         <img src="@/assets/marker.png" alt="한국외국어대학교" class="w-20 h-20 object-contain mb-3" />
-        <h1 class="text-xl font-bold text-gray-800">관리자 로그인</h1>
-        <p class="text-sm text-gray-500 mt-1">관리자 전용 공간입니다</p>
+        <h1 class="text-xl font-bold text-gray-800">사용자 로그인</h1>
+        <p class="text-sm text-gray-500 mt-1">사용자 전용 공간입니다</p>
       </div>
 
       <!-- 에러 메시지 -->
@@ -14,7 +14,6 @@
         {{ errorMsg }}
       </div>
 
-      <!-- 교재 login.jsp 폼 구조 -->
       <form @submit.prevent="handleLogin" class="space-y-4">
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-1">아이디</label>
@@ -23,7 +22,7 @@
             v-model="uID"
             type="text"
             placeholder="아이디를 입력하세요"
-            class="w-full border border-gray-300 rounded-lg px-4 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            class="w-full border border-gray-300 rounded-lg px-4 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-green-500"
           />
         </div>
 
@@ -34,22 +33,26 @@
             v-model="uPW"
             type="password"
             placeholder="비밀번호를 입력하세요"
-            class="w-full border border-gray-300 rounded-lg px-4 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            class="w-full border border-gray-300 rounded-lg px-4 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-green-500"
           />
         </div>
 
         <button
           type="submit"
           :disabled="isLoading"
-          class="w-full bg-blue-800 hover:bg-blue-900 text-white font-semibold py-2 rounded-lg transition-colors disabled:opacity-50"
+          class="w-full bg-green-700 hover:bg-green-800 text-white font-semibold py-2 rounded-lg transition-colors disabled:opacity-50"
         >
           {{ isLoading ? '로그인 중...' : '◀ 로그인 ▶' }}
         </button>
       </form>
 
-      <!-- 메인으로 돌아가기 -->
-      <div class="text-center mt-5">
-        <RouterLink to="/" class="text-sm text-gray-400 hover:text-gray-600">← 메인으로 돌아가기</RouterLink>
+      <!-- 회원가입 링크 -->
+      <div class="text-center mt-5 space-y-2">
+        <p class="text-sm text-gray-500">
+          처음 방문이신가요?
+          <RouterLink to="/signup" class="text-green-700 font-semibold hover:underline">회원가입</RouterLink>
+        </p>
+        <RouterLink to="/" class="block text-sm text-gray-400 hover:text-gray-600">← 메인으로 돌아가기</RouterLink>
       </div>
     </div>
   </div>
@@ -68,7 +71,6 @@ const isLoading = ref(false)
 const uIDRef = ref(null)
 const uPWRef = ref(null)
 
-// 교재 checkFun() 검증 로직과 동일
 async function handleLogin() {
   errorMsg.value = ''
 
@@ -94,16 +96,22 @@ async function handleLogin() {
 
     const data = await response.json()
 
-    if (response.ok && data.role === 'admin') {
-      // 관리자 role을 sessionStorage에 저장 (라우터 가드에서 사용)
-      sessionStorage.setItem('role', 'admin')
+    if (response.ok && data.role === 'user') {
+      // 사용자 정보와 role을 sessionStorage에 저장 (라우터 가드에서 사용)
+      sessionStorage.setItem('role', 'user')
+      sessionStorage.setItem('user', JSON.stringify({
+        id: data.id,
+        email: data.email,
+        signupTime: data.signupTime,
+      }))
+      // 로그인 성공 flash 메시지 저장
       sessionStorage.setItem('flashMsg', JSON.stringify({
-        msg: `${uID.value}님, 로그인 성공! 회원 목록을 불러옵니다.`,
+        msg: `환영합니다, ${data.id}님!`,
         time: Date.now()
       }))
-      router.push('/members')
-    } else if (response.ok && data.role !== 'admin') {
-      errorMsg.value = '관리자 계정이 아닙니다. 사용자 로그인을 이용해 주세요.'
+      router.push('/user/mypage')
+    } else if (data.role === 'admin') {
+      errorMsg.value = '관리자 계정은 관리자 로그인을 이용해 주세요.'
     } else {
       errorMsg.value = data.message || '아이디와 비밀번호를 확인하세요.'
     }

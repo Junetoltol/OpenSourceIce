@@ -1,4 +1,5 @@
-package com.example;
+// POST /api/logout - 서버 세션을 무효화하여 로그아웃 처리
+package com.odbo;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;

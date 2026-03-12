@@ -1,3 +1,4 @@
+<!-- 메인 화면: 관리자 접속(파란 버튼 → 로그인)과 사용자 접속(초록 버튼 → 사용자 로그인) 선택 -->
 <template>
   <div class="min-h-screen bg-gray-100 flex items-center justify-center">
     <div class="bg-white rounded-2xl shadow-lg w-full max-w-sm px-10 py-10 text-center">
@@ -16,7 +17,7 @@
         </RouterLink>
 
         <RouterLink
-          to="/signup"
+          to="/user-login"
           class="block w-full bg-green-700 hover:bg-green-800 text-white font-semibold py-2 rounded-lg transition-colors"
         >
           사용자 접속하기 ▶

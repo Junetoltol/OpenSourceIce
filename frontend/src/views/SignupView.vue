@@ -1,3 +1,4 @@
+<!-- 사용자 회원가입 화면: ID/PW/이메일 입력 후 /api/signup 호출, 성공 시 완료 페이지로 이동 -->
 <template>
   <div class="min-h-screen bg-gray-100 flex items-center justify-center">
     <div class="bg-white rounded-2xl shadow-lg w-full max-w-sm px-10 py-10">
@@ -32,9 +33,23 @@
             ref="userPWRef"
             v-model="userPW"
             type="password"
-            placeholder="6자 이상으로 입력하세요"
-            class="w-full border border-gray-300 rounded-lg px-4 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-green-500"
+            placeholder="8~16자, 영문·숫자·특수문자 포함"
+            :class="[
+              'w-full border rounded-lg px-4 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2',
+              userPW.length === 0
+                ? 'border-gray-300 focus:ring-green-500'
+                : pwValid
+                ? 'border-green-500 focus:ring-green-500'
+                : 'border-red-400 focus:ring-red-400'
+            ]"
           />
+          <!-- 비밀번호 조건 안내 -->
+          <p :class="[
+            'text-xs mt-1',
+            userPW.length === 0 ? 'text-gray-400' : pwValid ? 'text-green-600' : 'text-red-500'
+          ]">
+            8~16자, 영문·숫자·특수문자(!@#$ 등) 각 1개 이상 포함
+          </p>
         </div>
 
         <div>
@@ -75,7 +90,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 
 const router = useRouter()
@@ -89,6 +104,10 @@ const userIDRef = ref(null)
 const userPWRef = ref(null)
 const userMAILRef = ref(null)
 
+// 비밀번호 유효성: 8~16자, 영문·숫자·특수문자 각 1개 이상
+const pwRegex = /^(?=.*[a-zA-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>/?]).{8,16}$/
+const pwValid = computed(() => pwRegex.test(userPW.value))
+
 function resetForm() {
   userID.value = ''
   userPW.value = ''
@@ -96,7 +115,7 @@ function resetForm() {
   errorMsg.value = ''
 }
 
-// 교재 checkFun() 검증 로직과 동일
+// 교재 checkFun() 검증 로직 기반 + 비밀번호 강도 검사 추가
 async function handleSignup() {
   errorMsg.value = ''
 
@@ -105,8 +124,8 @@ async function handleSignup() {
     userIDRef.value.focus()
     return
   }
-  if (userPW.value.length < 6) {
-    errorMsg.value = '비밀번호는 6자 이상으로 입력해야 합니다.'
+  if (!pwValid.value) {
+    errorMsg.value = '비밀번호는 8~16자이며 영문, 숫자, 특수문자를 각 1개 이상 포함해야 합니다.'
     userPWRef.value.focus()
     return
   }
@@ -130,7 +149,14 @@ async function handleSignup() {
     })
 
     if (response.ok) {
+      // 성공 메시지를 sessionStorage에 저장 (300초 유효)
+      sessionStorage.setItem('flashMsg', JSON.stringify({
+        msg: `환영합니다, ${userID.value}님! 회원가입이 완료되었습니다.`,
+        time: Date.now()
+      }))
       router.push('/signup-success')
+    } else if (response.status === 409) {
+      errorMsg.value = '이미 사용 중인 아이디입니다. 다른 아이디를 입력해 주세요.'
     } else {
       errorMsg.value = '가입 중 오류가 발생했습니다. 다시 시도해 주세요.'
     }
