@@ -1,3 +1,4 @@
+// Vite 빌드 설정: TailwindCSS 플러그인 적용, /api 요청을 Tomcat(8081 포트)으로 프록시
 import { fileURLToPath, URL } from 'node:url'
 
 import { defineConfig } from 'vite'

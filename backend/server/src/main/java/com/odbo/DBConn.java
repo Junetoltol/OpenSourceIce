@@ -1,4 +1,5 @@
-package com.example;
+// MySQL 데이터베이스 연결을 생성하는 유틸리티 클래스 (DB: odbo, 계정: root/123456)
+package com.odbo;
 
 import java.sql.Connection;
 import java.sql.DriverManager;

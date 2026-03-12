@@ -1,4 +1,5 @@
-package com.example;
+// POST /api/login - DB의 role 컬럼으로 관리자/사용자 구분, HttpSession에 userId·role 저장
+package com.odbo;
 
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
@@ -16,23 +17,36 @@ public class LoginServlet extends HttpServlet {
         String uID = req.getParameter("uID");
         String uPW = req.getParameter("uPW");
 
-        // 관리자 계정 확인 (space / 123456)
-        if ("space".equals(uID) && "123456".equals(uPW)) {
-            res.getWriter().write("{\"success\": true, \"role\": \"admin\"}");
-            return;
-        }
-
-        // DB에서 일반 사용자 확인
+        // DB에서 아이디·비밀번호·role·이메일·가입일 조회
         try (Connection conn = DBConn.getConnection()) {
             PreparedStatement ps = conn.prepareStatement(
-                "SELECT id FROM members WHERE id = ? AND passwd = ?"
+                "SELECT id, email, signupTime, role FROM members WHERE id = ? AND passwd = ?"
             );
             ps.setString(1, uID);
             ps.setString(2, uPW);
             ResultSet rs = ps.executeQuery();
 
             if (rs.next()) {
-                res.getWriter().write("{\"success\": true, \"role\": \"user\"}");
+                String role       = rs.getString("role");
+                String email      = rs.getString("email");
+                String signupTime = rs.getString("signupTime");
+
+                // HttpSession에 userId와 role 저장 (유효시간 300초)
+                HttpSession session = req.getSession();
+                session.setMaxInactiveInterval(300);
+                session.setAttribute("userId", uID);
+                session.setAttribute("role", role);
+
+                if ("admin".equals(role)) {
+                    res.getWriter().write("{\"success\": true, \"role\": \"admin\"}");
+                } else {
+                    res.getWriter().write(
+                        "{\"success\": true, \"role\": \"user\","
+                        + "\"id\": \"" + uID + "\","
+                        + "\"email\": \"" + email + "\","
+                        + "\"signupTime\": \"" + signupTime + "\"}"
+                    );
+                }
             } else {
                 res.setStatus(401);
                 res.getWriter().write("{\"success\": false, \"message\": \"아이디 또는 비밀번호가 틀렸습니다.\"}");

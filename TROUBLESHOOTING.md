@@ -66,9 +66,17 @@
   - 브라우저에서 `http://localhost:5173` 접속 확인
 
 - [ ] **8. 백엔드 빌드 + 배포**
-  - VS Code 왼쪽 패널 **MAVEN** → Lifecycle → **package** 더블클릭
-  - VS Code 왼쪽 패널 **SERVERS** → Tomcat **Stop** → **Start**
-  - `http://localhost:8080` 접속 확인
+  1. VS Code 왼쪽 패널 **MAVEN** → Lifecycle → **package** 더블클릭
+     → `backend/server/target/ROOT.war` 생성됨
+  2. VS Code **SERVERS** 패널 → Tomcat **Stop**
+  3. 생성된 `ROOT.war`를 Tomcat webapps 폴더에 복사:
+     ```
+     backend/server/target/ROOT.war
+     → C:/Program Files/Apache Software Foundation/Tomcat 11.0/webapps/ROOT.war
+     ```
+  4. 기존 `webapps/ROOT/` 폴더 삭제 (있으면)
+  5. Tomcat **Start** → ROOT.war 자동으로 풀림
+  - `http://localhost:8081` 접속 확인 (포트는 본인 Tomcat 설정에 따라 다름)
 
 > 막히는 단계가 있으면 아래 **트러블슈팅** 섹션을 확인하세요!
 

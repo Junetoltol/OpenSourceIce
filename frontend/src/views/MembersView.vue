@@ -1,3 +1,4 @@
+<!-- 회원 목록 화면: 관리자 전용, /api/members로 DB 전체 회원을 불러와 테이블로 표시 -->
 <template>
   <div class="min-h-screen bg-gray-100 p-8">
     <div class="max-w-2xl mx-auto">
@@ -13,6 +14,11 @@
         >
           로그아웃
         </button>
+      </div>
+
+      <!-- 로그인 성공 flash 메시지 (sessionStorage에서 읽음, 5초 후 사라짐) -->
+      <div v-if="flashMsg" class="bg-green-50 border border-green-200 text-green-700 text-sm rounded-lg px-4 py-2 mb-4">
+        {{ flashMsg }}
       </div>
 
       <!-- 오류 메시지 -->
@@ -57,8 +63,19 @@ import { useRouter } from 'vue-router'
 const router = useRouter()
 const members = ref([])
 const errorMsg = ref('')
+const flashMsg = ref('')
 
 onMounted(async () => {
+  // 로그인 성공 flash 메시지 읽기
+  const raw = sessionStorage.getItem('flashMsg')
+  if (raw) {
+    const { msg, time } = JSON.parse(raw)
+    sessionStorage.removeItem('flashMsg')
+    if (Date.now() - time < 300_000) {
+      flashMsg.value = msg
+      setTimeout(() => { flashMsg.value = '' }, 5000)
+    }
+  }
   try {
     const response = await fetch('/api/members')
     if (response.status === 401) {
@@ -76,6 +93,7 @@ onMounted(async () => {
 
 async function handleLogout() {
   await fetch('/api/logout', { method: 'POST' })
+  sessionStorage.removeItem('role')
   router.push('/')
 }
 </script>

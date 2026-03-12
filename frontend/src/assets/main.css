@@ -1,2 +1,2 @@
-@import './base.css';
+/* TailwindCSS 전역 스타일 임포트 - 모든 페이지에 Tailwind 유틸리티 클래스 적용 */
 @import 'tailwindcss';

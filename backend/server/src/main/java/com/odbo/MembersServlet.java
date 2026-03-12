@@ -1,4 +1,5 @@
-package com.example;
+// GET /api/members - DB에서 전체 회원 목록을 JSON으로 반환 (관리자 전용, 세션 role 확인)
+package com.odbo;
 
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
@@ -11,6 +12,15 @@ public class MembersServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse res) throws IOException {
         res.setContentType("application/json; charset=UTF-8");
+
+        // 세션에서 role 확인 — 관리자(admin)만 접근 허용
+        HttpSession session = req.getSession(false);
+        String role = (session != null) ? (String) session.getAttribute("role") : null;
+        if (!"admin".equals(role)) {
+            res.setStatus(401);
+            res.getWriter().write("{\"success\":false,\"message\":\"관리자 권한이 필요합니다.\"}");
+            return;
+        }
 
         try (Connection conn = DBConn.getConnection()) {
             PreparedStatement ps = conn.prepareStatement(
@@ -30,10 +40,10 @@ public class MembersServlet extends HttpServlet {
                 first = false;
             }
             sb.append("]");
-            res.getWriter().write(sb.toString());
+            res.getWriter().write("{\"success\":true,\"members\":" + sb + "}");
         } catch (SQLException e) {
             res.setStatus(500);
-            res.getWriter().write("[]");
+            res.getWriter().write("{\"success\":false,\"members\":[]}");
         }
     }
 }
